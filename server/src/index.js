@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+dotenv.config({ path : "./.env" });
 import morgan from "morgan";
 import connectDb from "./db/connectDb.js";
 import cookieParser from "cookie-parser";
@@ -12,7 +13,6 @@ app.use(cors({
 }))
 
 
-dotenv.config({ path : "./.env" });
 
 
 app.use(express.json());
@@ -20,6 +20,18 @@ app.use(express.urlencoded({ extended : true }));
 app.use(cookieParser());
 app.use(morgan("dev"));
 
+
+import entryRouter from "./routes/entry.routes.js";
+
+app.use("/diary", entryRouter);
+
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(err.statusCode || 500).json({
+        success: false,
+        message: err.message || "Internal Server Error"
+    });
+});
 
 
 
