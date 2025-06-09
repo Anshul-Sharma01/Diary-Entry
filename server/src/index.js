@@ -22,8 +22,10 @@ app.use(morgan("dev"));
 
 
 import entryRouter from "./routes/entry.routes.js";
+import userRouter from "./routes/user.routes.js";
 
 app.use("/diary", entryRouter);
+app.use("/user", userRouter);
 
 app.use((err, req, res, next) => {
     console.error(err.stack);

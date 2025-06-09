@@ -14,6 +14,8 @@ interface DiaryContextType {
   updateEntry: (id: string, entry: Partial<DiaryEntry>) => Promise<void>;
   deleteEntry: (id: string) => Promise<void>;
   setCurrentEntry: (entry: DiaryEntry | null) => void;
+  user: any;
+  setUser: (user: any) => void;
 }
 
 const DiaryContext = createContext<DiaryContextType | undefined>(undefined);
@@ -42,6 +44,7 @@ export const DiaryProvider: React.FC<DiaryProviderProps> = ({ children }) => {
     hasNextPage: false,
     hasPrevPage: false
   });
+  const [user, setUser] = useState<any>(null);
 
   const fetchEntries = async (page = 1) => {
     setLoading(true);
@@ -135,7 +138,9 @@ export const DiaryProvider: React.FC<DiaryProviderProps> = ({ children }) => {
     createEntry,
     updateEntry,
     deleteEntry,
-    setCurrentEntry
+    setCurrentEntry,
+    user,
+    setUser
   };
 
   return <DiaryContext.Provider value={value}>{children}</DiaryContext.Provider>;

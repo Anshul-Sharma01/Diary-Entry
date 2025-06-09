@@ -5,7 +5,9 @@ import EntryDetail from '../entries/EntryDetails';
 import Header from './Header';
 import { useDiary } from '../../context/DiaryContext';
 
-const DiaryLayout = () => {
+const DiaryLayout = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
+  if (!isAuthenticated) return null;
+
   const { currentEntry, setCurrentEntry } = useDiary();
   const [isCreating, setIsCreating] = useState(false);
   const [isEditing, setIsEditing] = useState(false);

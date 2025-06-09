@@ -11,4 +11,10 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
+  server: {
+    proxy: {
+      '/user': 'http://localhost:3000',
+      '/diary': 'http://localhost:3000',
+    },
+  },
 });
