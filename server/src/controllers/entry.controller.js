@@ -2,6 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { Entry } from "../models/entry.model.js";
+import { encrypt, decrypt } from "../utils/encryption.js";
 
 // Add a new diary entry
 const addDiaryEntry = asyncHandler(async (req, res) => {
@@ -11,11 +12,15 @@ const addDiaryEntry = asyncHandler(async (req, res) => {
         throw new ApiError(400, "All fields are mandatory");
     }
 
-    const entry = await Entry.create({ content, date, mood });
+    const encryptedContent = encrypt(content);
+
+    const entry = await Entry.create({ content : encryptedContent, date, mood });
 
     if (!entry) {
         throw new ApiError(400, "Error occurred, please try again");
     }
+
+    entry.content = decrypt(entry.content);
 
     return res.status(201).json(
         new ApiResponse(201, entry, "Successfully added a new diary entry")
@@ -36,9 +41,14 @@ const getAllDiaryEntries = asyncHandler(async (req, res) => {
         .skip(skip)
         .limit(limit);
 
+    const decryptedEntries = entries.map(entry => ({
+        ...entry._doc,
+        content : decrypt(entry.content)
+    }))
+
     return res.status(200).json(
         new ApiResponse(200, {
-            entries,
+            entries : decryptedEntries,
             pagination: {
                 totalEntries,
                 totalPages,
@@ -60,6 +70,7 @@ const getDiaryEntryById = asyncHandler(async (req, res) => {
     if (!entry) {
         throw new ApiError(404, "Diary entry not found");
     }
+    entry.content = decrypt(entry.content);
 
     return res.status(200).json(
         new ApiResponse(200, entry, "Fetched diary entry by ID")
@@ -71,15 +82,24 @@ const updateDiaryEntry = asyncHandler(async (req, res) => {
     const { id } = req.params;
     const { content, date, mood } = req.body;
 
+    const updatedData = {
+        ...(content && { content : encrypt(content) }),
+        ...(date && {date}),
+        ...(mood && { mood})
+    }
+
     const updatedEntry = await Entry.findByIdAndUpdate(
         id,
-        { content, date, mood },
+        updatedData,
         { new: true, runValidators: true }
     );
 
     if (!updatedEntry) {
         throw new ApiError(404, "Diary entry not found or failed to update");
     }
+
+    updatedEntry.content = decrypt(updatedEntry.content);
+
 
     return res.status(200).json(
         new ApiResponse(200, updatedEntry, "Diary entry updated successfully")
