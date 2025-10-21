@@ -6,8 +6,12 @@ import {
     updateDiaryEntry,
     deleteDiaryEntry
 } from "../controllers/entry.controller.js";
+import { verifyJWT } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
+
+// All diary routes require authentication
+router.use(verifyJWT);
 
 router.post("/entries", addDiaryEntry);
 router.get("/entries", getAllDiaryEntries);

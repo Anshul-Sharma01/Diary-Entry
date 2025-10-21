@@ -13,6 +13,11 @@ const entrySchema = new Schema({
         type : String,
         enum : ["Happy", "OverJoyed", "Sad", "Depressed", "Tensed", "Relaxed", "Angry", "Neutral"],
         default : "Neutral"
+    },
+    user: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+        required: [true, "User reference is required"]
     }
 }, {
     timestamps : true

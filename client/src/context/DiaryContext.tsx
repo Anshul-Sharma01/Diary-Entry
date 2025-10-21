@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import toast from 'react-hot-toast';
 import type { DiaryEntry, Mood, PaginationInfo } from '../types/diary';
 import * as diaryService from '../services/diaryServices';
 
@@ -78,8 +79,11 @@ export const DiaryProvider: React.FC<DiaryProviderProps> = ({ children }) => {
     try {
       await diaryService.createEntry(entry);
       await fetchEntries(1); // Refresh to first page
+      toast.success('Diary entry created successfully!');
     } catch (err) {
-      setError('Failed to create diary entry');
+      const errorMessage = 'Failed to create diary entry';
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error(err);
     } finally {
       setLoading(false);
@@ -95,8 +99,11 @@ export const DiaryProvider: React.FC<DiaryProviderProps> = ({ children }) => {
       if (currentEntry && currentEntry._id === id) {
         setCurrentEntry({ ...currentEntry, ...entry });
       }
+      toast.success('Diary entry updated successfully!');
     } catch (err) {
-      setError('Failed to update diary entry');
+      const errorMessage = 'Failed to update diary entry';
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error(err);
     } finally {
       setLoading(false);
@@ -112,8 +119,11 @@ export const DiaryProvider: React.FC<DiaryProviderProps> = ({ children }) => {
       if (currentEntry && currentEntry._id === id) {
         setCurrentEntry(null);
       }
+      toast.success('Diary entry deleted successfully!');
     } catch (err) {
-      setError('Failed to delete diary entry');
+      const errorMessage = 'Failed to delete diary entry';
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error(err);
     } finally {
       setLoading(false);

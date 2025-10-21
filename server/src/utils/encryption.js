@@ -17,7 +17,7 @@ const ivLength = 16;
 
 // Convert any secret key string into a secure 32-byte Buffer using SHA-256
 const rawKey = process.env.DIARY_ENCRYPTION_KEY;
-const secretKey = crypto.createHash("sha256").update(rawKey).digest(); // 32-byte Buffer
+const secretKey = crypto.createHash("sha256").update(rawKey).digest(); 
 
 export function encrypt(text) {
     if (typeof text !== "string") {

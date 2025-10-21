@@ -22,7 +22,9 @@ app.use(morgan("dev"));
 
 
 import entryRouter from "./routes/entry.routes.js";
+import authRouter from "./routes/auth.routes.js";
 
+app.use("/auth", authRouter);
 app.use("/diary", entryRouter);
 
 app.use((err, req, res, next) => {

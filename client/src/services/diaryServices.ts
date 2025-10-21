@@ -17,12 +17,16 @@ async function handleResponse<T>(response: Response): Promise<T> {
 }
 
 export async function getAllEntries(page: number = 1): Promise<{entries: DiaryEntry[], pagination: PaginationInfo}> {
-  const response = await fetch(`${API_URL}/entries?page=${page}`);
+  const response = await fetch(`${API_URL}/entries?page=${page}`, {
+    credentials: 'include'
+  });
   return handleResponse<{entries: DiaryEntry[], pagination: PaginationInfo}>(response);
 }
 
 export async function getEntryById(id: string): Promise<DiaryEntry> {
-  const response = await fetch(`${API_URL}/entries/${id}`);
+  const response = await fetch(`${API_URL}/entries/${id}`, {
+    credentials: 'include'
+  });
   return handleResponse<DiaryEntry>(response);
 }
 
@@ -32,9 +36,9 @@ export async function createEntry(entry: Partial<DiaryEntry>): Promise<DiaryEntr
     headers: {
       'Content-Type': 'application/json'
     },
+    credentials: 'include',
     body: JSON.stringify(entry),
   });
-  console.log("Response from creat-entry : ", response);
   return handleResponse<DiaryEntry>(response);
 }
 

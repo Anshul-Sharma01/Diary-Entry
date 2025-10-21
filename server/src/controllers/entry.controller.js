@@ -8,13 +8,18 @@ import { encrypt, decrypt } from "../utils/encryption.js";
 const addDiaryEntry = asyncHandler(async (req, res) => {
     const { content, date, mood } = req.body;
 
-    if (!content && !date && !mood) {
-        throw new ApiError(400, "All fields are mandatory");
+    if (!content) {
+        throw new ApiError(400, "Content is required");
     }
 
     const encryptedContent = encrypt(content);
 
-    const entry = await Entry.create({ content : encryptedContent, date, mood });
+    const entry = await Entry.create({ 
+        content: encryptedContent, 
+        date, 
+        mood,
+        user: req.user._id
+    });
 
     if (!entry) {
         throw new ApiError(400, "Error occurred, please try again");
@@ -33,10 +38,10 @@ const getAllDiaryEntries = asyncHandler(async (req, res) => {
     const limit = 10;
     const skip = (page - 1) * limit;
 
-    const totalEntries = await Entry.countDocuments();
+    const totalEntries = await Entry.countDocuments({ user: req.user._id });
     const totalPages = Math.ceil(totalEntries / limit);
 
-    const entries = await Entry.find()
+    const entries = await Entry.find({ user: req.user._id })
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit);
@@ -65,7 +70,7 @@ const getAllDiaryEntries = asyncHandler(async (req, res) => {
 const getDiaryEntryById = asyncHandler(async (req, res) => {
     const { id } = req.params;
 
-    const entry = await Entry.findById(id);
+    const entry = await Entry.findOne({ _id: id, user: req.user._id });
 
     if (!entry) {
         throw new ApiError(404, "Diary entry not found");
@@ -88,8 +93,8 @@ const updateDiaryEntry = asyncHandler(async (req, res) => {
         ...(mood && { mood})
     }
 
-    const updatedEntry = await Entry.findByIdAndUpdate(
-        id,
+    const updatedEntry = await Entry.findOneAndUpdate(
+        { _id: id, user: req.user._id },
         updatedData,
         { new: true, runValidators: true }
     );
@@ -100,7 +105,6 @@ const updateDiaryEntry = asyncHandler(async (req, res) => {
 
     updatedEntry.content = decrypt(updatedEntry.content);
 
-
     return res.status(200).json(
         new ApiResponse(200, updatedEntry, "Diary entry updated successfully")
     );
@@ -110,7 +114,7 @@ const updateDiaryEntry = asyncHandler(async (req, res) => {
 const deleteDiaryEntry = asyncHandler(async (req, res) => {
     const { id } = req.params;
 
-    const deletedEntry = await Entry.findByIdAndDelete(id);
+    const deletedEntry = await Entry.findOneAndDelete({ _id: id, user: req.user._id });
 
     if (!deletedEntry) {
         throw new ApiError(404, "Diary entry not found or failed to delete");
