@@ -1,6 +1,6 @@
 import type { DiaryEntry, ApiResponse, PaginationInfo } from '../types/diary';
 
-const API_URL = 'http://localhost:3000/diary';
+const API_URL = import.meta.env.VITE_API_URL as string;
 
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
@@ -31,7 +31,7 @@ export async function getEntryById(id: string): Promise<DiaryEntry> {
 }
 
 export async function createEntry(entry: Partial<DiaryEntry>): Promise<DiaryEntry> {
-  const response = await fetch("http://localhost:3000/diary/entries", {
+  const response = await fetch(`${API_URL}/entries`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
