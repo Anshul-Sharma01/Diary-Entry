@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import toast from 'react-hot-toast';
-import type { DiaryEntry, Mood, PaginationInfo } from '../types/diary';
+import type { DiaryEntry, PaginationInfo } from '../types/diary';
 import * as diaryService from '../services/diaryServices';
 
 interface DiaryContextType {
