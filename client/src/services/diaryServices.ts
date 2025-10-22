@@ -1,6 +1,7 @@
 import type { DiaryEntry, ApiResponse, PaginationInfo } from '../types/diary';
+import { apiConfig } from '../config/api';
 
-const API_URL = import.meta.env.VITE_API_URL as string;
+const API_URL = apiConfig.diaryUrl;
 
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {

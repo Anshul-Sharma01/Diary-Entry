@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import toast from 'react-hot-toast';
+import { apiConfig } from '../config/api';
 
 interface User {
   _id: string;
@@ -35,7 +36,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const API_URL = import.meta.env.VITE_API_URL as string;
+  const API_URL = apiConfig.authUrl;
 
   // Check if user is already logged in
   useEffect(() => {
@@ -44,6 +45,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const checkAuthStatus = async () => {
     try {
+      console.log('Checking auth status at:', `${API_URL}/auth/current-user`);
       const response = await fetch(`${API_URL}/auth/current-user`, {
         credentials: 'include',
       });
@@ -52,7 +54,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const data = await response.json();
         if (data.success) {
           setUser(data.data);
+          console.log('User authenticated:', data.data.username);
         }
+      } else {
+        console.log('Auth check response not ok:', response.status);
       }
     } catch (error) {
       console.error('Auth check failed:', error);
@@ -64,6 +69,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (username: string, password: string) => {
     try {
       setLoading(true);
+      console.log('Attempting login at:', `${API_URL}/auth/login`);
       const response = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
         headers: {
@@ -74,6 +80,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       });
 
       const data = await response.json();
+      console.log('Login response:', { status: response.status, data });
 
       if (!response.ok) {
         throw new Error(data.message || 'Login failed');
@@ -86,6 +93,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         throw new Error(data.message || 'Login failed');
       }
     } catch (error: any) {
+      console.error('Login error:', error);
       toast.error(error.message || 'Login failed. Please try again.');
       throw error;
     } finally {
@@ -96,6 +104,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const register = async (username: string, password: string) => {
     try {
       setLoading(true);
+      console.log('Attempting registration at:', `${API_URL}/auth/register`);
       const response = await fetch(`${API_URL}/auth/register`, {
         method: 'POST',
         headers: {
@@ -106,6 +115,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       });
 
       const data = await response.json();
+      console.log('Registration response:', { status: response.status, data });
 
       if (!response.ok) {
         throw new Error(data.message || 'Registration failed');
@@ -118,6 +128,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         throw new Error(data.message || 'Registration failed');
       }
     } catch (error: any) {
+      console.error('Registration error:', error);
       toast.error(error.message || 'Registration failed. Please try again.');
       throw error;
     } finally {

@@ -8,8 +8,10 @@ import cookieParser from "cookie-parser";
 
 const app = express();
 app.use(cors({
-    origin : [process.env.FRONTEND_URL],
-    credentials : true
+    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
 }))
 
 
@@ -23,6 +25,12 @@ app.use(morgan("dev"));
 
 import entryRouter from "./routes/entry.routes.js";
 import authRouter from "./routes/auth.routes.js";
+
+// Add request logging middleware
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.path} - Origin: ${req.get('Origin')}`);
+    next();
+});
 
 app.use("/auth", authRouter);
 app.use("/diary", entryRouter);
